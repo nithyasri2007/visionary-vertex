@@ -47,6 +47,60 @@
         ul li {
             margin-bottom: 10px;
         }
+             .comment-form {
+            margin: 0 auto;
+            max-width: 600px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .comment-form input, .comment-form textarea {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .comment-form textarea {
+            height: 100px;
+            resize: none;
+        }
+        button:hover {
+            background-color: #256a27;                  
+        }
+        .comments-section {
+            margin-top: 20px;
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .comment {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .comment .reply-section {
+            margin-left: 20px;
+            margin-top: 10px;
+            border-left: 2px solid #ccc;
+            padding-left: 10px;
+        }
+        .reply-btn {
+            margin-top: 5px;
+            font-size: 0.9em;
+            cursor: pointer;
+            color: #023126;
+            border: none;
+            background: none;
+        }
     </style>
 </head>
 <body>
@@ -112,12 +166,102 @@
             <p>Whether you’re a seasoned plant lover or a newbie, the Snake Plant is your go-to choice for effortless greenery and health benefits. Its timeless appeal and adaptability make it a must-have for any home or office.</p>
         </div>
     
-    <h2 > Leave a Comment</h2>
-    <form action="submit_comment.php" method="post">
-        <textarea name="comment" placeholder="Write Your Comments here...." required></textarea>
-        <br>
-        <button type="submit" >Submit Comment</button>
-    </form>  </div>
+     <div class="comment-form">
+            <input type="text" id="userName" placeholder="Your Name" required />
+            <textarea id="userComment" placeholder="Write your comment here..." required></textarea>
+            <button onclick="submitComment()">Post Comment</button>
+    </div>
+    
+        <!-- Comments Section -->
+        <div id="commentsSection" class="comments-section"></div>
+    
+        <script>
+            const comments = []; // Array to store comments and replies
+            const isProprietor = true; // Set this to false for regular users
+    
+            function submitComment() {
+                const userName = document.getElementById('userName').value.trim();
+                const userComment = document.getElementById('userComment').value.trim();
+    
+                if (!userName ||  !userComment) {
+                    alert('All fields are required!');
+                    return;
+                }
+    
+                // Add comment to the comments array
+                comments.push({
+                    name: userName,
+                    text: userComment,
+                    replies: []
+                });
+    
+                // Clear input fields
+                document.getElementById('userName').value = '';
+               
+                document.getElementById('userComment').value = '';
+    
+                displayComments();
+            }
+    
+            function replyToComment(index) {
+                if (!isProprietor) {
+                    alert('Only the blog owner can reply to comments.');
+                    return;
+                }
+    
+                const replyText = prompt('Enter your reply:');
+                if (replyText && replyText.trim() !== '') {
+                    comments[index].replies.push({
+                        name: 'Blog Owner',
+                        text: replyText.trim()
+                    });
+                    displayComments();
+                }
+            }
+    
+            function displayComments() {
+                const commentsSection = document.getElementById('commentsSection');
+                commentsSection.innerHTML = ''; // Clear previous comments
+    
+                comments.forEach((comment, index) => {
+                    // Create comment container
+                    const commentDiv = document.createElement('div');
+                    commentDiv.classList.add('comment');
+    
+                    // Add comment details
+                    const commentHeader = document.createElement('p');
+                    commentHeader.innerHTML = `<strong>${comment.name}</strong> (${comment.email})`;
+                    commentDiv.appendChild(commentHeader);
+    
+                    const commentText = document.createElement('p');
+                    commentText.innerText = comment.text;
+                    commentDiv.appendChild(commentText);
+    
+                    // Add reply button (only for the proprietor)
+                    if (isProprietor) {
+                        const replyButton = document.createElement('button');
+                        replyButton.classList.add('reply-btn');
+                        replyButton.innerText = 'Reply';
+                        replyButton.onclick = () => replyToComment(index);
+                        commentDiv.appendChild(replyButton);
+                    }
+    
+                    // Add replies (if any)
+                    if (comment.replies.length > 0) {
+                        const repliesDiv = document.createElement('div');
+                        repliesDiv.classList.add('reply-section');
+                        comment.replies.forEach(reply => {
+                            const replyText = document.createElement('p');
+                            replyText.innerHTML = `<strong>${reply.name}:</strong> ${reply.text}`;
+                            repliesDiv.appendChild(replyText);
+                        });
+                        commentDiv.appendChild(repliesDiv);
+                    }
+    
+                    commentsSection.appendChild(commentDiv);
+                });
+            }
+        </script>
     <a href="Creatathon.html" class="btn btn-primary">Back To Homepage</a>
 </div>
 </body>
